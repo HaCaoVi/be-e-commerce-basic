@@ -1,0 +1,18 @@
+# ASP.NET Core configs
+appsettings.Development.json
+appsettings.Production.json
+appsettings.*.json
+!appsettings.json
+
+# Secrets
+secrets.json
+*.secrets.json
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Build output
+bin/
+obj/
