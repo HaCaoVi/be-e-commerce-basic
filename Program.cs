@@ -1,4 +1,7 @@
+using e_commerce_basic.Common;
 using e_commerce_basic.Database;
+using e_commerce_basic.Middlewares;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +22,29 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
      )
     );
 });
+
+// config validation error
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .Where(x => x.Value!.Errors.Count > 0)
+            .ToDictionary(
+                x => x.Key,
+                x => x.Value!.Errors.Select(e => e.ErrorMessage)
+            );
+
+        var response = ApiResponse<object>.Fail(
+            "Validation failed",
+            errors
+        );
+
+        return new BadRequestObjectResult(response);
+    };
+});
+
+
 var app = builder.Build();
 
 // check connection
@@ -50,6 +76,10 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
+
+// config exception
+app.UseMiddleware<ExceptionMiddleware>();
+
 
 app.Run();
 
