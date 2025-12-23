@@ -1,11 +1,7 @@
 using e_commerce_basic.Common;
 using e_commerce_basic.Dtos.Account;
 using e_commerce_basic.Interfaces;
-using e_commerce_basic.Models;
-using e_commerce_basic.Services;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace e_commerce_basic.Controllers
 {

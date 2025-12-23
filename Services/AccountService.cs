@@ -1,4 +1,5 @@
 using e_commerce_basic.Dtos.Account;
+using e_commerce_basic.Dtos.Token;
 using e_commerce_basic.Interfaces;
 using e_commerce_basic.Models;
 using Microsoft.AspNetCore.Identity;
@@ -10,10 +11,13 @@ namespace e_commerce_basic.Services
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        public AccountService(UserManager<User> userManager, SignInManager<User> signInManager)
+        private readonly ITokenService _tokenService;
+
+        public AccountService(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _tokenService = tokenService;
         }
 
         public async Task<NewUserDto> LoginAsync(LoginDto loginDto)
@@ -35,13 +39,24 @@ namespace e_commerce_basic.Services
             if (!user.IsActivated)
                 throw new UnauthorizedAccessException("Account is disabled");
 
+            var roles = await _userManager.GetRolesAsync(user);
+            var roleName = roles.FirstOrDefault() ?? throw new InvalidOperationException("User has no role");
+
+            var email = user.Email ?? throw new InvalidOperationException("User email is null");
+            var fullname = user.Fullname ?? throw new InvalidOperationException("User username is null");
+
+            var newTokenDto = new NewTokenDto
+            {
+                Email = email,
+                Fullname = fullname,
+                RoleName = roleName
+            };
             return new NewUserDto
             {
-                Email = user.Email!,
-                Username = user.UserName!,
-                AccessToken = ""
+                Email = email,
+                Fullname = fullname,
+                AccessToken = _tokenService.CreateAccessToken(newTokenDto)
             };
         }
-
     }
 }

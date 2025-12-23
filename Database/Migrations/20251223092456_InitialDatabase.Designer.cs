@@ -12,8 +12,8 @@ using e_commerce_basic.Database;
 namespace e_commerce_basic.Database.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20251223063025_InitialbaseDatabase")]
-    partial class InitialbaseDatabase
+    [Migration("20251223092456_InitialDatabase")]
+    partial class InitialDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -348,12 +348,6 @@ namespace e_commerce_basic.Database.Migrations
                     b.Property<DateTime?>("Birthday")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("CodeActive")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("CodeExpire")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("longtext");
@@ -367,6 +361,11 @@ namespace e_commerce_basic.Database.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Fullname")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("Gender")
                         .HasColumnType("int");

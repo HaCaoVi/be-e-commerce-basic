@@ -35,6 +35,7 @@ namespace e_commerce_basic.Database.Seedings
             {
                 admin = new User
                 {
+                    Fullname = "Admin System",
                     UserName = email,
                     Email = email,
                     EmailConfirmed = true,

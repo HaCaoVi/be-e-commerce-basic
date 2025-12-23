@@ -6,6 +6,9 @@ namespace e_commerce_basic.Models
 {
     public class User : IdentityUser
     {
+        [Required]
+        [MaxLength(255)]
+        public required string Fullname { get; set; }
         [MaxLength(500)]
         public string AvatarUrl { get; set; } = string.Empty;
         public DateTime? Birthday { get; set; }

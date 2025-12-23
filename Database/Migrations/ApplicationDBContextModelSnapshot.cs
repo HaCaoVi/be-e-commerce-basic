@@ -345,12 +345,6 @@ namespace e_commerce_basic.Database.Migrations
                     b.Property<DateTime?>("Birthday")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("CodeActive")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("CodeExpire")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("longtext");
@@ -364,6 +358,11 @@ namespace e_commerce_basic.Database.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Fullname")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("Gender")
                         .HasColumnType("int");
