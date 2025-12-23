@@ -1,17 +1,9 @@
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using e_commerce_basic.Types;
 
 namespace e_commerce_basic.Models
 {
-    public enum TypeDiscount
-    {
-        [Description("%")]
-        Percent = 0,
-        [Description("VND")]
-        Vnd = 1
-    }
-
     [Table("Products")]
     public class Product
     {
@@ -33,13 +25,13 @@ namespace e_commerce_basic.Models
         [Required]
         [Column(TypeName = "decimal(18,2)")]
         public decimal Discount { get; set; }
-        public TypeDiscount TypeDiscount { get; set; }
+        public EDiscount TypeDiscount { get; set; }
         public bool IsActivated { get; set; } = true;
         [Required]
         [MaxLength(500)]
         public string ImageUrl { get; set; } = string.Empty;
         public bool IsDeleted { get; set; } = false;
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         [Required]
         public int SubCategoryId { get; set; }

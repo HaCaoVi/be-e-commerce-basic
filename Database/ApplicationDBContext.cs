@@ -1,9 +1,10 @@
 using e_commerce_basic.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace e_commerce_basic.Database
 {
-    public class ApplicationDBContext : DbContext
+    public class ApplicationDBContext : IdentityDbContext<User>
     {
         public ApplicationDBContext(DbContextOptions dbContextOptions) : base(dbContextOptions) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -1,6 +1,9 @@
 using e_commerce_basic.Common;
 using e_commerce_basic.Database;
+using e_commerce_basic.Database.Seedings;
 using e_commerce_basic.Middlewares;
+using e_commerce_basic.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,8 +47,26 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     };
 });
 
+// config password
+builder.Services.AddIdentity<User, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequiredLength = 8;
+}).AddEntityFrameworkStores<ApplicationDBContext>();
+
 
 var app = builder.Build();
+// config role
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await IdentitySeed.SeedRolesAsync(services);
+    await IdentitySeed.SeedAdminAsync(services);
+}
+
 
 // check connection
 using (var scope = app.Services.CreateScope())
@@ -80,6 +101,8 @@ if (!app.Environment.IsDevelopment())
 // config exception
 app.UseMiddleware<ExceptionMiddleware>();
 
+// app.UseAuthentication();
+// app.UseAuthorization();
 
 app.Run();
 
