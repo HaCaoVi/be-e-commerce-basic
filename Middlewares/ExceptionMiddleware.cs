@@ -8,11 +8,16 @@ namespace e_commerce_basic.Middlewares
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<ExceptionMiddleware> _logger;
+        private readonly IWebHostEnvironment _env;
 
-        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
+        public ExceptionMiddleware(
+            RequestDelegate next,
+            ILogger<ExceptionMiddleware> logger,
+            IWebHostEnvironment env)
         {
             _next = next;
             _logger = logger;
+            _env = env;
         }
 
         public async Task Invoke(HttpContext context)
@@ -25,12 +30,29 @@ namespace e_commerce_basic.Middlewares
             {
                 _logger.LogError(ex, ex.Message);
 
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 context.Response.ContentType = "application/json";
 
-                var response = ApiResponse<string>.Fail(
-                    "Internal server error"
-                    , ex.Message
+                var statusCode = ex switch
+                {
+                    UnauthorizedAccessException => HttpStatusCode.Unauthorized,
+                    KeyNotFoundException => HttpStatusCode.NotFound,
+                    ArgumentException => HttpStatusCode.BadRequest,
+                    _ => HttpStatusCode.InternalServerError
+                };
+
+                context.Response.StatusCode = (int)statusCode;
+
+                object? errors = null;
+                if (_env.IsDevelopment())
+                {
+                    errors = ex.Message;
+                }
+
+                var response = ApiResponse<object>.Fail(
+                    ex is UnauthorizedAccessException or ArgumentException
+                        ? ex.Message
+                        : "Internal server error",
+                    errors
                 );
 
                 await context.Response.WriteAsync(
@@ -39,4 +61,5 @@ namespace e_commerce_basic.Middlewares
             }
         }
     }
+
 }
