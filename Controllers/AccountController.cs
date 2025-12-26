@@ -5,6 +5,7 @@ using e_commerce_basic.Dtos.Token;
 using e_commerce_basic.Interfaces;
 using e_commerce_basic.Mappings;
 using e_commerce_basic.Models;
+using e_commerce_basic.Services.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,17 +16,21 @@ namespace e_commerce_basic.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _accountService;
-        public AccountController(IAccountService accountService)
+        private readonly EmailConfirmationService _emailConfirmationService;
+
+        public AccountController(IAccountService accountService, EmailConfirmationService emailConfirmationService)
         {
             _accountService = accountService;
+            _emailConfirmationService = emailConfirmationService;
         }
 
         [AllowAnonymous]
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
-            var result = await _accountService.RegisterAsync(registerDto);
-            return Ok(ApiResponse<AccountDto>.Ok(result.ToAccountDto("User")));
+            var user = await _accountService.RegisterAsync(registerDto);
+            await _emailConfirmationService.SendConfirmEmailAsync(user);
+            return Ok(ApiResponse<AccountDto>.Ok(user.ToAccountDto("User")));
         }
 
         [AllowAnonymous]

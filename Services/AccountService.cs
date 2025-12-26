@@ -106,7 +106,6 @@ namespace e_commerce_basic.Services
 
                 throw new ApplicationException($"Add role failed: {errors}");
             }
-
             return newUser;
         }
     }

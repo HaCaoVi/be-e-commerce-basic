@@ -5,6 +5,8 @@ using e_commerce_basic.Interfaces;
 using e_commerce_basic.Middlewares;
 using e_commerce_basic.Models;
 using e_commerce_basic.Services;
+using e_commerce_basic.Services.Auth;
+using e_commerce_basic.Services.Email;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -82,7 +84,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     };
 });
 
-// config password
+// config Identity
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -90,7 +92,9 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     options.Password.RequireUppercase = true;
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequiredLength = 8;
-}).AddEntityFrameworkStores<ApplicationDBContext>();
+    options.SignIn.RequireConfirmedEmail = true;
+}).AddEntityFrameworkStores<ApplicationDBContext>()
+.AddDefaultTokenProviders();
 
 // Config JWT
 builder.Services.AddAuthentication(options =>
@@ -128,6 +132,8 @@ builder.Services.AddControllers(options =>
 
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<EmailConfirmationService>();
 
 var app = builder.Build();
 
