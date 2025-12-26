@@ -65,10 +65,49 @@ namespace e_commerce_basic.Services
 
         public async Task<User> LogoutAsync(string userId)
         {
-            var user = await _userManager.FindByIdAsync(userId) ?? throw new BadHttpRequestException("UserId not found");
+            var user = await _userManager.FindByIdAsync(userId) ?? throw new UnauthorizedAccessException("Invalid token");
             user.RefreshToken = null;
             await _userManager.UpdateAsync(user);
             return user;
+        }
+
+        public async Task<User> RegisterAsync(RegisterDto registerDto)
+        {
+            var existingUser = await _userManager.FindByNameAsync(registerDto.Username);
+            if (existingUser != null)
+                throw new InvalidOperationException("Username already exists");
+
+            var existingEmail = await _userManager.FindByEmailAsync(registerDto.Email);
+            if (existingEmail != null)
+                throw new InvalidOperationException("Email already exists");
+
+            var newUser = new User
+            {
+                Email = registerDto.Email,
+                Fullname = registerDto.Fullname,
+                UserName = registerDto.Username,
+                EmailConfirmed = false,
+            };
+            var createResult = await _userManager.CreateAsync(newUser, registerDto.Password);
+
+            if (!createResult.Succeeded)
+            {
+                var errors = string.Join(", ",
+                    createResult.Errors.Select(e => e.Description));
+
+                throw new ApplicationException(errors);
+            }
+
+            var roleResult = await _userManager.AddToRoleAsync(newUser, "User");
+            if (!roleResult.Succeeded)
+            {
+                var errors = string.Join(", ",
+                    roleResult.Errors.Select(e => e.Description));
+
+                throw new ApplicationException($"Add role failed: {errors}");
+            }
+
+            return newUser;
         }
     }
 }

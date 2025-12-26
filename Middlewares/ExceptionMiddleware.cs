@@ -36,7 +36,8 @@ namespace e_commerce_basic.Middlewares
                 {
                     UnauthorizedAccessException => HttpStatusCode.Unauthorized,
                     KeyNotFoundException => HttpStatusCode.NotFound,
-                    ArgumentException => HttpStatusCode.BadRequest,
+                    // ArgumentException => HttpStatusCode.BadRequest,
+                    InvalidOperationException => HttpStatusCode.BadRequest,
                     _ => HttpStatusCode.InternalServerError
                 };
 

@@ -3,6 +3,8 @@ using e_commerce_basic.Common;
 using e_commerce_basic.Dtos.Account;
 using e_commerce_basic.Dtos.Token;
 using e_commerce_basic.Interfaces;
+using e_commerce_basic.Mappings;
+using e_commerce_basic.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +19,15 @@ namespace e_commerce_basic.Controllers
         {
             _accountService = accountService;
         }
+
+        [AllowAnonymous]
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
+        {
+            var result = await _accountService.RegisterAsync(registerDto);
+            return Ok(ApiResponse<AccountDto>.Ok(result.ToAccountDto("User")));
+        }
+
         [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)

@@ -17,7 +17,7 @@ namespace e_commerce_basic.Models
         public string Address { get; set; } = string.Empty;
         public EAccountType AccountType { get; set; }
         public string? RefreshToken { get; set; }
-        public bool IsActivated { get; set; } = false;
+        public bool IsActivated { get; set; } = true;
         [MinLength(4)]
         public bool IsDeleted { get; set; } = false;
         public DateTime CreatedAt { get; set; }

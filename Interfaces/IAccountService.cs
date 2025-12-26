@@ -7,5 +7,7 @@ namespace e_commerce_basic.Interfaces
     {
         Task<TokenDto> LoginAsync(LoginDto loginDto);
         Task<User> LogoutAsync(string username);
+        Task<User> RegisterAsync(RegisterDto registerDto);
+
     }
 }
