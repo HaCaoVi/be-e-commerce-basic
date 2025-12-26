@@ -1,6 +1,6 @@
 namespace e_commerce_basic.Dtos.Account
 {
-    public class NewUserDto
+    public class TokenDto
     {
         public required string Fullname { get; set; }
         public string? Email { get; set; }

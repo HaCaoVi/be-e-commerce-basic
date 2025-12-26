@@ -20,7 +20,7 @@ namespace e_commerce_basic.Services
             _tokenService = tokenService;
         }
 
-        public async Task<NewUserDto> LoginAsync(LoginDto loginDto)
+        public async Task<TokenDto> LoginAsync(LoginDto loginDto)
         {
             var normalizedUsername = _userManager.NormalizeName(loginDto.Username);
             var user = await _userManager.Users
@@ -44,21 +44,31 @@ namespace e_commerce_basic.Services
             var roleName = roles.FirstOrDefault() ?? throw new InvalidOperationException("User has no role");
 
             var email = user.Email ?? throw new InvalidOperationException("User email is null");
-            var fullname = user.Fullname ?? throw new InvalidOperationException("User username is null");
+            var fullname = user.Fullname ?? throw new InvalidOperationException("User fullname is null");
+            var username = user.UserName ?? throw new InvalidOperationException("User username is null");
             var newTokenDto = new NewTokenDto
             {
                 Email = email,
-                Fullname = fullname,
-                RoleName = roleName
+                Id = int.Parse(user.Id),
+                RoleName = roleName,
+                Username = username
             };
             user.RefreshToken = _tokenService.CreateRefreshToken(newTokenDto);
             await _userManager.UpdateAsync(user);
-            return new NewUserDto
+            return new TokenDto
             {
                 Email = email,
                 Fullname = fullname,
                 AccessToken = _tokenService.CreateAccessToken(newTokenDto),
             };
+        }
+
+        public async Task<User> LogoutAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId) ?? throw new BadHttpRequestException("UserId not found");
+            user.RefreshToken = null;
+            await _userManager.UpdateAsync(user);
+            return user;
         }
     }
 }

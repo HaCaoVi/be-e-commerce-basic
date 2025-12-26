@@ -1,13 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using e_commerce_basic.Dtos.Token;
 using e_commerce_basic.Interfaces;
-using e_commerce_basic.Models;
 using Microsoft.IdentityModel.Tokens;
 
 namespace e_commerce_basic.Services
@@ -27,16 +22,18 @@ namespace e_commerce_basic.Services
         public string CreateAccessToken(NewTokenDto newTokenDto)
         {
             var email = newTokenDto.Email ?? throw new InvalidOperationException("Email is missing");
-            var fullname = newTokenDto.Fullname ?? throw new InvalidOperationException("Username is missing");
+            var Id = newTokenDto.Id;
             var roleName = newTokenDto.RoleName ?? throw new InvalidOperationException("Role name is missing");
+            var username = newTokenDto.Username ?? throw new InvalidOperationException("Username is missing");
 
             int accessTokenExpire = int.Parse(_config["JWT:AccessTokenExpire"] ?? throw new InvalidOperationException("JWT:AccessTokenExpire is missing"));
 
             var claims = new List<Claim>
             {
-                new (JwtRegisteredClaimNames.Email,email),
-                new (JwtRegisteredClaimNames.GivenName,fullname),
-                new ("role", roleName)
+                new (ClaimTypes.NameIdentifier,Id.ToString()),
+                new (ClaimTypes.Email,email),
+                new (ClaimTypes.GivenName,username),
+                new (ClaimTypes.Role, roleName)
             };
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -55,16 +52,18 @@ namespace e_commerce_basic.Services
         public string CreateRefreshToken(NewTokenDto newTokenDto)
         {
             var email = newTokenDto.Email ?? throw new InvalidOperationException("Email is missing");
-            var fullname = newTokenDto.Fullname ?? throw new InvalidOperationException("Username is missing");
+            var Id = newTokenDto.Id;
             var roleName = newTokenDto.RoleName ?? throw new InvalidOperationException("Role name is missing");
+            var username = newTokenDto.Username ?? throw new InvalidOperationException("Username is missing");
 
             int refreshTokenExpire = int.Parse(_config["JWT:RefreshTokenExpire"] ?? throw new InvalidOperationException("JWT:RefreshTokenExpire is missing"));
 
             var claims = new List<Claim>
             {
-                new (JwtRegisteredClaimNames.Email,email),
-                new (JwtRegisteredClaimNames.GivenName,fullname),
-                new ("role", roleName)
+                new (ClaimTypes.NameIdentifier,Id.ToString()),
+                new (ClaimTypes.Email,email),
+                new (ClaimTypes.GivenName,username),
+                new (ClaimTypes.Role, roleName)
             };
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
             var tokenDescriptor = new SecurityTokenDescriptor
