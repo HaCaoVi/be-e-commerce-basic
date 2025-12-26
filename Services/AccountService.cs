@@ -49,7 +49,7 @@ namespace e_commerce_basic.Services
             var newTokenDto = new NewTokenDto
             {
                 Email = email,
-                Id = int.Parse(user.Id),
+                Id = user.Id.ToString(),
                 RoleName = roleName,
                 Username = username
             };

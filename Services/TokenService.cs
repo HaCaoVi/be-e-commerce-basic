@@ -55,7 +55,6 @@ namespace e_commerce_basic.Services
             var Id = newTokenDto.Id;
             var roleName = newTokenDto.RoleName ?? throw new InvalidOperationException("Role name is missing");
             var username = newTokenDto.Username ?? throw new InvalidOperationException("Username is missing");
-
             int refreshTokenExpire = int.Parse(_config["JWT:RefreshTokenExpire"] ?? throw new InvalidOperationException("JWT:RefreshTokenExpire is missing"));
 
             var claims = new List<Claim>
