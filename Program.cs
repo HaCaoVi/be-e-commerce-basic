@@ -8,6 +8,7 @@ using e_commerce_basic.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -119,7 +120,11 @@ builder.Services.AddAuthentication(options =>
 });
 
 // config controller
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add(new AuthorizeFilter());
+});
+
 
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -167,10 +172,9 @@ if (!app.Environment.IsDevelopment())
 // config exception
 app.UseMiddleware<ExceptionMiddleware>();
 
-// app.UseAuthentication();
-
-// config jwt
-// app.UseAuthorization();
+// config auth
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

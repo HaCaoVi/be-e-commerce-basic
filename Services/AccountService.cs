@@ -22,16 +22,11 @@ namespace e_commerce_basic.Services
 
         public async Task<NewUserDto> LoginAsync(LoginDto loginDto)
         {
+            var normalizedUsername = _userManager.NormalizeName(loginDto.Username);
             var user = await _userManager.Users
-                    .FirstOrDefaultAsync(u => u.UserName == loginDto.Username.ToLower()
+                    .FirstOrDefaultAsync(u => u.NormalizedUserName == normalizedUsername
                 )
                 ?? throw new UnauthorizedAccessException("Username or password is invalid");
-
-            var result = await _signInManager
-                .CheckPasswordSignInAsync(user, loginDto.Password, false);
-
-            if (!result.Succeeded)
-                throw new UnauthorizedAccessException("Username or password is invalid");
 
             if (!user.EmailConfirmed)
                 throw new UnauthorizedAccessException("Email not confirmed");
@@ -39,23 +34,30 @@ namespace e_commerce_basic.Services
             if (!user.IsActivated)
                 throw new UnauthorizedAccessException("Account is disabled");
 
+            var result = await _signInManager
+                .CheckPasswordSignInAsync(user, loginDto.Password, false);
+
+            if (!result.Succeeded)
+                throw new UnauthorizedAccessException("Username or password is invalid");
+
             var roles = await _userManager.GetRolesAsync(user);
             var roleName = roles.FirstOrDefault() ?? throw new InvalidOperationException("User has no role");
 
             var email = user.Email ?? throw new InvalidOperationException("User email is null");
             var fullname = user.Fullname ?? throw new InvalidOperationException("User username is null");
-
             var newTokenDto = new NewTokenDto
             {
                 Email = email,
                 Fullname = fullname,
                 RoleName = roleName
             };
+            user.RefreshToken = _tokenService.CreateRefreshToken(newTokenDto);
+            await _userManager.UpdateAsync(user);
             return new NewUserDto
             {
                 Email = email,
                 Fullname = fullname,
-                AccessToken = _tokenService.CreateAccessToken(newTokenDto)
+                AccessToken = _tokenService.CreateAccessToken(newTokenDto),
             };
         }
     }

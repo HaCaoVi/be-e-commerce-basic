@@ -1,6 +1,7 @@
 using e_commerce_basic.Common;
 using e_commerce_basic.Dtos.Account;
 using e_commerce_basic.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace e_commerce_basic.Controllers
@@ -14,7 +15,7 @@ namespace e_commerce_basic.Controllers
         {
             _accountService = accountService;
         }
-
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
