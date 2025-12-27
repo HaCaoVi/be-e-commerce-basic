@@ -6,7 +6,16 @@ namespace e_commerce_basic.Database
 {
     public class ApplicationDBContext : IdentityDbContext<User>
     {
-        public ApplicationDBContext(DbContextOptions dbContextOptions) : base(dbContextOptions) { }
+        public ApplicationDBContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
+        {
+        }
+
+        public DbSet<Gallery> Galleries { get; set; } = null!;
+        public DbSet<Category> Categories { get; set; } = null!;
+        public DbSet<Product> Products { get; set; } = null!;
+        public DbSet<Stock> Stocks { get; set; } = null!;
+        public DbSet<SubCategory> SubCategories { get; set; } = null!;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // config index entity
