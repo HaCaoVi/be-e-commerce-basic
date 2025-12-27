@@ -22,33 +22,73 @@ namespace e_commerce_basic.Services
             _storageClient = StorageClient.Create(googleCredential);
         }
 
-        public async Task<UploadedFileDto> UploadFileAsync(Stream fileStream, string fileName, string contentType)
+        public async Task DeleteFile(IEnumerable<string>? filesToDelete = null)
         {
-            if (fileStream == null || fileStream.Length == 0)
-                throw new ArgumentException("File stream is empty", nameof(fileStream));
-
-            var objectName = $"{Guid.NewGuid()}_{fileName}";
-
-            var obj = await _storageClient.UploadObjectAsync(
-                bucket: _bucketName,
-                objectName: objectName,
-                contentType: contentType,
-                source: fileStream
-            );
-            await _storageClient.UpdateObjectAsync(
-                obj,
-                new UpdateObjectOptions { PredefinedAcl = PredefinedObjectAcl.PublicRead }
-            );
-
-            var publicUrl = $"https://storage.googleapis.com/{_bucketName}/{obj.Name}";
-            return new UploadedFileDto
+            if (filesToDelete != null)
             {
-                FileName = fileName,
-                Url = publicUrl,
-                ContentType = contentType,
-                Size = fileStream.Length,
-                UploadedAt = DateTime.UtcNow
-            }; ;
+                foreach (var oldFile in filesToDelete)
+                {
+                    try
+                    {
+                        await _storageClient.DeleteObjectAsync(_bucketName, oldFile);
+                    }
+                    catch (Google.GoogleApiException ex) when (ex.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
+                    {
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Failed to delete file '{oldFile}': {ex.Message}");
+                    }
+                }
+            }
+        }
+
+        public async Task<List<UploadedFileDto>> UploadFilesAsync(
+      IEnumerable<(Stream Stream, string FileName, string ContentType)> files,
+      IEnumerable<string>? filesToDelete = null
+  )
+        {
+            if (files == null || !files.Any())
+                throw new ArgumentException("No files to upload", nameof(files));
+
+            var uploadedFiles = new List<UploadedFileDto>();
+
+            foreach (var file in files)
+            {
+                if (file.Stream == null || file.Stream.Length == 0)
+                    continue;
+
+                var objectName = $"{Guid.NewGuid()}_{file.FileName}";
+
+                var obj = await _storageClient.UploadObjectAsync(
+                    bucket: _bucketName,
+                    objectName: objectName,
+                    contentType: file.ContentType,
+                    source: file.Stream
+                );
+
+                await _storageClient.UpdateObjectAsync(
+                    obj,
+                    new UpdateObjectOptions { PredefinedAcl = PredefinedObjectAcl.PublicRead }
+                );
+
+                var publicUrl = $"https://storage.googleapis.com/{_bucketName}/{obj.Name}";
+
+                uploadedFiles.Add(new UploadedFileDto
+                {
+                    FileName = file.FileName,
+                    Url = publicUrl,
+                    ContentType = file.ContentType,
+                    Size = file.Stream.Length,
+                    UploadedAt = DateTime.UtcNow
+                });
+            }
+
+            // Xóa file cũ nếu có
+            if (filesToDelete != null)
+                await DeleteFile(filesToDelete);
+
+            return uploadedFiles;
         }
     }
 }

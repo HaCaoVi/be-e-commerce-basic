@@ -1,3 +1,4 @@
+using e_commerce_basic.Common;
 using e_commerce_basic.Dtos.File;
 using e_commerce_basic.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -21,13 +22,16 @@ namespace e_commerce_basic.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> Upload([FromForm] FileUploadRequest request)
         {
-            if (request.File == null || request.File.Length == 0)
-                return BadRequest("File is empty");
+            if (request.Files == null || request.Files.Count == 0)
+                return BadRequest("No files uploaded");
 
-            using var stream = request.File.OpenReadStream();
-            var url = await _firebaseStorage.UploadFileAsync(stream, request.File.FileName, request.File.ContentType);
+            var filesToUpload = request.Files
+                .Select(f => (f.OpenReadStream(), f.FileName, f.ContentType));
 
-            return Ok(new { url });
+            var uploadedFiles = await _firebaseStorage.UploadFilesAsync(filesToUpload, request.FilesToDelete);
+
+            return Ok(ApiResponse<List<UploadedFileDto>>.Ok(uploadedFiles));
         }
+
     }
 }

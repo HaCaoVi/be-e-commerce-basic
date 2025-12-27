@@ -4,6 +4,6 @@ namespace e_commerce_basic.Interfaces
 {
     public interface IFirebaseStorageService
     {
-        Task<UploadedFileDto> UploadFileAsync(Stream fileStream, string fileName, string contentType);
+        Task<List<UploadedFileDto>> UploadFilesAsync(IEnumerable<(Stream Stream, string FileName, string ContentType)> files, IEnumerable<string>? filesToDelete = null);
     }
 }
