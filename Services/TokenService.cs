@@ -21,7 +21,6 @@ namespace e_commerce_basic.Services
 
         public string CreateAccessToken(NewTokenDto newTokenDto)
         {
-            var email = newTokenDto.Email ?? throw new ApplicationException("Email is missing");
             var Id = newTokenDto.Id;
             var roleName = newTokenDto.RoleName ?? throw new ApplicationException("Role name is missing");
             var username = newTokenDto.Username ?? throw new ApplicationException("Username is missing");
@@ -31,7 +30,6 @@ namespace e_commerce_basic.Services
             var claims = new List<Claim>
             {
                 new (ClaimTypes.NameIdentifier,Id.ToString()),
-                new (ClaimTypes.Email,email),
                 new (ClaimTypes.GivenName,username),
                 new (ClaimTypes.Role, roleName)
             };
@@ -51,7 +49,6 @@ namespace e_commerce_basic.Services
 
         public string CreateRefreshToken(NewTokenDto newTokenDto)
         {
-            var email = newTokenDto.Email ?? throw new ApplicationException("Email is missing");
             var Id = newTokenDto.Id;
             var roleName = newTokenDto.RoleName ?? throw new ApplicationException("Role name is missing");
             var username = newTokenDto.Username ?? throw new ApplicationException("Username is missing");
@@ -60,7 +57,6 @@ namespace e_commerce_basic.Services
             var claims = new List<Claim>
             {
                 new (ClaimTypes.NameIdentifier,Id.ToString()),
-                new (ClaimTypes.Email,email),
                 new (ClaimTypes.GivenName,username),
                 new (ClaimTypes.Role, roleName)
             };

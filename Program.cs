@@ -65,6 +65,20 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
     );
 });
 
+// Cấu hình CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
+
 // config validation error
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
@@ -171,7 +185,6 @@ builder.Services.AddControllers(options =>
     options.Filters.Add(new AuthorizeFilter());
 });
 
-
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -179,6 +192,10 @@ builder.Services.AddScoped<EmailConfirmationService>();
 builder.Services.AddScoped<IFirebaseStorageService, FirebaseStorageService>();
 
 var app = builder.Build();
+
+app.Urls.Add("http://localhost:8080");
+
+app.UseCors("AllowFrontend");
 
 // config role
 using (var scope = app.Services.CreateScope())

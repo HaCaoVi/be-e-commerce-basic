@@ -61,7 +61,6 @@ namespace e_commerce_basic.Controllers
 
             return Ok(ApiResponse<NewTokenDto>.Ok(new NewTokenDto
             {
-                Email = email!,
                 RoleName = role!,
                 Username = username!,
                 Id = Id!.ToString()

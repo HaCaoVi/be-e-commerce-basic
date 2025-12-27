@@ -43,12 +43,10 @@ namespace e_commerce_basic.Services
             var roles = await _userManager.GetRolesAsync(user);
             var roleName = roles.FirstOrDefault() ?? throw new ApplicationException("User has no role");
 
-            var email = user.Email ?? throw new ApplicationException("User email is null");
             var fullname = user.Fullname ?? throw new ApplicationException("User fullname is null");
             var username = user.UserName ?? throw new ApplicationException("User username is null");
             var newTokenDto = new NewTokenDto
             {
-                Email = email,
                 Id = user.Id.ToString(),
                 RoleName = roleName,
                 Username = username
@@ -57,7 +55,7 @@ namespace e_commerce_basic.Services
             await _userManager.UpdateAsync(user);
             return new TokenDto
             {
-                Email = email,
+                Username = username,
                 Fullname = fullname,
                 AccessToken = _tokenService.CreateAccessToken(newTokenDto),
             };
