@@ -21,7 +21,5 @@ namespace e_commerce_basic.Controllers
             await _emailConfirmationService.ConfirmEmailAsync(userId, token);
             return Ok("Email confirmed");
         }
-
-
     }
 }

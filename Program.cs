@@ -1,3 +1,4 @@
+using System.Text.Json;
 using e_commerce_basic.Common;
 using e_commerce_basic.Database;
 using e_commerce_basic.Database.Seedings;
@@ -7,6 +8,8 @@ using e_commerce_basic.Models;
 using e_commerce_basic.Services;
 using e_commerce_basic.Services.Auth;
 using e_commerce_basic.Services.Email;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -119,8 +122,48 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(
             System.Text.Encoding.UTF8.GetBytes(signingKey)
-        )
+        ),
+        ValidateLifetime = true,
+        RequireExpirationTime = true,
+        ClockSkew = TimeSpan.Zero
     };
+});
+
+// Config firebase
+var firebaseOptions = builder.Configuration
+    .GetSection("Firebase")
+    .Get<FirebaseService>()
+    ?? throw new Exception("Firebase service account config missing");
+
+// Tạo initializer cho Service Account
+var initializer = new ServiceAccountCredential.Initializer(
+        firebaseOptions.ClientEmail)
+{
+    ProjectId = firebaseOptions.ProjectId,
+    KeyId = firebaseOptions.PrivateKeyId,
+    Scopes = new[]
+    {
+        "https://www.googleapis.com/auth/cloud-platform"
+    }
+};
+
+var privateKey = firebaseOptions.PrivateKey
+    .Replace("\\n", "\n")
+    .Trim();
+
+// Gắn private key
+var serviceAccountCredential = new ServiceAccountCredential(
+    initializer.FromPrivateKey(privateKey)
+);
+
+// Convert sang GoogleCredential (KHÔNG obsolete)
+GoogleCredential credential = serviceAccountCredential.ToGoogleCredential();
+
+// Init Firebase
+FirebaseApp.Create(new AppOptions
+{
+    Credential = credential,
+    ProjectId = firebaseOptions.ProjectId
 });
 
 // config controller
