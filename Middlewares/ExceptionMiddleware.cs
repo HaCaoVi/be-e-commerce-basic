@@ -57,7 +57,13 @@ namespace e_commerce_basic.Middlewares
                 );
 
                 await context.Response.WriteAsync(
-                    JsonSerializer.Serialize(response)
+                    JsonSerializer.Serialize(
+                        response,
+                        new JsonSerializerOptions
+                        {
+                            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                        }
+                    )
                 );
             }
         }

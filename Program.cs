@@ -1,3 +1,4 @@
+using System.Text.Json;
 using e_commerce_basic.Common;
 using e_commerce_basic.Database;
 using e_commerce_basic.Database.Seedings;
@@ -180,10 +181,11 @@ FirebaseApp.Create(new AppOptions
 });
 
 // config controller
-builder.Services.AddControllers(options =>
-{
-    options.Filters.Add(new AuthorizeFilter());
-});
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    });
 
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
