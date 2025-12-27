@@ -27,9 +27,6 @@ namespace e_commerce_basic.Models
         public decimal Discount { get; set; }
         public EDiscount TypeDiscount { get; set; }
         public bool IsActivated { get; set; } = true;
-        [Required]
-        [MaxLength(500)]
-        public string ImageUrl { get; set; } = string.Empty;
         public bool IsDeleted { get; set; } = false;
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

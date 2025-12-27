@@ -1,6 +1,6 @@
-namespace e_commerce_basic.Services
+namespace e_commerce_basic.Models
 {
-    public class FirebaseService
+    public class Firebase
     {
         public required string ProjectId { get; set; }
 

@@ -1,4 +1,3 @@
-using System.Text.Json;
 using e_commerce_basic.Common;
 using e_commerce_basic.Database;
 using e_commerce_basic.Database.Seedings;
@@ -132,7 +131,7 @@ builder.Services.AddAuthentication(options =>
 // Config firebase
 var firebaseOptions = builder.Configuration
     .GetSection("Firebase")
-    .Get<FirebaseService>()
+    .Get<Firebase>()
     ?? throw new Exception("Firebase service account config missing");
 
 // Tạo initializer cho Service Account
@@ -177,6 +176,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<EmailConfirmationService>();
+builder.Services.AddScoped<IFirebaseStorageService, FirebaseStorageService>();
 
 var app = builder.Build();
 

@@ -10,9 +10,18 @@ namespace e_commerce_basic.Models
         public int Id { get; set; }
         [Required]
         [MaxLength(500)]
-        public required string ImageUrl { get; set; }
+        public string FileName { get; set; } = null!;
+        [Required]
+        [MaxLength(500)]
+        public string Url { get; set; } = null!;
+        [Required]
+        public string ContentType { get; set; } = null!;
+        [Required]
+        public long Size { get; set; }
+        public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
         [Required]
         public int ProductId { get; set; }
         public required Product Product { get; set; }
+
     }
 }
