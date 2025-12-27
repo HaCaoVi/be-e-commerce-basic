@@ -50,7 +50,7 @@ namespace e_commerce_basic.Middlewares
                 }
 
                 var response = ApiResponse<object>.Fail(
-                    ex is UnauthorizedAccessException or ArgumentException
+                    ex is UnauthorizedAccessException or ArgumentException or InvalidOperationException
                         ? ex.Message
                         : "Internal server error",
                     errors

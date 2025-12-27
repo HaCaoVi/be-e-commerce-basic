@@ -41,11 +41,11 @@ namespace e_commerce_basic.Services
                 throw new UnauthorizedAccessException("Username or password is invalid");
 
             var roles = await _userManager.GetRolesAsync(user);
-            var roleName = roles.FirstOrDefault() ?? throw new InvalidOperationException("User has no role");
+            var roleName = roles.FirstOrDefault() ?? throw new ApplicationException("User has no role");
 
-            var email = user.Email ?? throw new InvalidOperationException("User email is null");
-            var fullname = user.Fullname ?? throw new InvalidOperationException("User fullname is null");
-            var username = user.UserName ?? throw new InvalidOperationException("User username is null");
+            var email = user.Email ?? throw new ApplicationException("User email is null");
+            var fullname = user.Fullname ?? throw new ApplicationException("User fullname is null");
+            var username = user.UserName ?? throw new ApplicationException("User username is null");
             var newTokenDto = new NewTokenDto
             {
                 Email = email,
@@ -95,7 +95,7 @@ namespace e_commerce_basic.Services
                 var errors = string.Join(", ",
                     createResult.Errors.Select(e => e.Description));
 
-                throw new ApplicationException(errors);
+                throw new InvalidOperationException(errors);
             }
 
             var roleResult = await _userManager.AddToRoleAsync(newUser, "User");
