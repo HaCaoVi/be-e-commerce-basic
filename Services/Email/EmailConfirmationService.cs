@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using e_commerce_basic.Models;
 using e_commerce_basic.Interfaces;
+using e_commerce_basic.Common;
 
 namespace e_commerce_basic.Services.Auth
 {
@@ -21,11 +22,11 @@ namespace e_commerce_basic.Services.Auth
         public async Task<User> ConfirmEmailAsync(string userId, string token)
         {
             var user = await _userManager.FindByIdAsync(userId)
-                ?? throw new InvalidOperationException("Invalid user");
+                ?? throw new BadRequestException("Invalid user");
 
             var result = await _userManager.ConfirmEmailAsync(user, token);
             if (!result.Succeeded)
-                throw new InvalidOperationException("Invalid token");
+                throw new BadRequestException("Invalid token");
 
             return user;
         }

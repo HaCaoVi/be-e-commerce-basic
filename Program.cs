@@ -5,6 +5,7 @@ using e_commerce_basic.Database.Seedings;
 using e_commerce_basic.Interfaces;
 using e_commerce_basic.Middlewares;
 using e_commerce_basic.Models;
+using e_commerce_basic.Repositories;
 using e_commerce_basic.Services;
 using e_commerce_basic.Services.Auth;
 using e_commerce_basic.Services.Email;
@@ -126,7 +127,7 @@ builder.Services.AddAuthentication(options =>
 }).AddJwtBearer(options =>
 {
     var signingKey = builder.Configuration["JWT:SigningKey"]
-    ?? throw new InvalidOperationException("JWT:SigningKey is missing");
+    ?? throw new BadRequestException("JWT:SigningKey is missing");
 
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -200,6 +201,11 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<EmailConfirmationService>();
 builder.Services.AddScoped<IFirebaseStorageService, FirebaseStorageService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
+builder.Services.AddScoped<IStockRepository, StockRepository>();
+builder.Services.AddScoped<IGalleryRepository, GalleryRepository>();
 
 var app = builder.Build();
 

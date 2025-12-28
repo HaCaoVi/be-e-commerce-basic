@@ -1,3 +1,4 @@
+using e_commerce_basic.Common;
 using e_commerce_basic.Dtos.Account;
 using e_commerce_basic.Dtos.Token;
 using e_commerce_basic.Interfaces;
@@ -73,11 +74,11 @@ namespace e_commerce_basic.Services
         {
             var existingUser = await _userManager.FindByNameAsync(registerDto.Username);
             if (existingUser != null)
-                throw new InvalidOperationException("Username already exists");
+                throw new BadRequestException("Username already exists");
 
             var existingEmail = await _userManager.FindByEmailAsync(registerDto.Email);
             if (existingEmail != null)
-                throw new InvalidOperationException("Email already exists");
+                throw new BadRequestException("Email already exists");
 
             var newUser = new User
             {
@@ -93,7 +94,7 @@ namespace e_commerce_basic.Services
                 var errors = string.Join(", ",
                     createResult.Errors.Select(e => e.Description));
 
-                throw new InvalidOperationException(errors);
+                throw new BadRequestException(errors);
             }
 
             var roleResult = await _userManager.AddToRoleAsync(newUser, "User");

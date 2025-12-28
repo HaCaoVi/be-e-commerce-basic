@@ -30,27 +30,29 @@ namespace e_commerce_basic.Middlewares
             {
                 _logger.LogError(ex, ex.Message);
 
-                context.Response.ContentType = "application/json";
-
-                var statusCode = ex switch
+                context.Response.Clear();
+                context.Response.StatusCode = ex switch
                 {
-                    UnauthorizedAccessException => HttpStatusCode.Unauthorized,
-                    KeyNotFoundException => HttpStatusCode.NotFound,
-                    // ArgumentException => HttpStatusCode.BadRequest,
-                    InvalidOperationException => HttpStatusCode.BadRequest,
-                    _ => HttpStatusCode.InternalServerError
+                    UnauthorizedAccessException => (int)HttpStatusCode.Unauthorized,
+                    KeyNotFoundException => (int)HttpStatusCode.NotFound,
+                    ArgumentException => (int)HttpStatusCode.BadRequest,
+                    BadRequestException => (int)HttpStatusCode.BadRequest,
+                    _ => (int)HttpStatusCode.InternalServerError
                 };
 
-                context.Response.StatusCode = (int)statusCode;
+                context.Response.ContentType = "application/json";
 
                 object? errors = null;
                 if (_env.IsDevelopment())
                 {
-                    errors = ex.Message;
+                    errors = new
+                    {
+                        ex.Message
+                    };
                 }
 
                 var response = ApiResponse<object>.Fail(
-                    ex is UnauthorizedAccessException or ArgumentException or InvalidOperationException
+                    ex is UnauthorizedAccessException or ArgumentException or BadRequestException
                         ? ex.Message
                         : "Internal server error",
                     errors
@@ -68,5 +70,4 @@ namespace e_commerce_basic.Middlewares
             }
         }
     }
-
 }

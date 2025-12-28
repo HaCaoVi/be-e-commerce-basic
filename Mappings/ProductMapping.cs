@@ -35,14 +35,14 @@ namespace e_commerce_basic.Mappings
                     Name = product.SubCategory.Name,
                     CategoryId = product.SubCategory.CategoryId,
                 },
-                Galleries = product.Galleries.Select(g => new GalleryDto
+                Galleries = product.Galleries?.Select(g => new GalleryDto
                 {
                     Id = g.Id,
                     Url = g.Url,
                     ContentType = g.ContentType,
                     FileName = g.FileName,
                     Size = g.Size
-                }).ToList(),
+                }).ToList() ?? [],
             };
         }
 

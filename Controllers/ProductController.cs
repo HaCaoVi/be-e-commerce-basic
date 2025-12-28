@@ -18,7 +18,7 @@ namespace e_commerce_basic.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateProduct([FromBody] CreateProductDto createProductDto)
         {
-            var product = await _productService.AddProductAsync(createProductDto);
+            var product = await _productService.HandleAddProductAsync(createProductDto);
             return Ok(product.ToProductDto());
         }
     }

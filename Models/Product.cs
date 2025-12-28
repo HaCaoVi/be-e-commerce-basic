@@ -28,7 +28,7 @@ namespace e_commerce_basic.Models
         public EDiscount TypeDiscount { get; set; }
         public bool IsActivated { get; set; } = true;
         public bool IsDeleted { get; set; } = false;
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         [Required]
         public int SubCategoryId { get; set; }

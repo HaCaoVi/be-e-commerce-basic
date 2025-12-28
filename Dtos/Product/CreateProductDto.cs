@@ -19,10 +19,8 @@ namespace e_commerce_basic.Dtos.Product
         [MaxLength(500)]
         public string? Description { get; set; }
         [Required]
-        [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
         [Required]
-        [Column(TypeName = "decimal(18,2)")]
         public decimal Discount { get; set; }
         public EDiscount TypeDiscount { get; set; }
         public bool IsActivated { get; set; } = true;

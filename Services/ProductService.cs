@@ -1,56 +1,55 @@
+using e_commerce_basic.Common;
 using e_commerce_basic.Database;
 using e_commerce_basic.Dtos.Product;
 using e_commerce_basic.Interfaces;
 using e_commerce_basic.Mappings;
 using e_commerce_basic.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace e_commerce_basic.Services
 {
     public class ProductService : IProductService
     {
-        private readonly ApplicationDBContext _context;
-        public ProductService(ApplicationDBContext context)
+        private readonly IProductRepository _repoProduct;
+        private readonly ISubCategoryRepository _repoSubCategory;
+        private readonly IStockRepository _repoStock;
+        private readonly IGalleryRepository _repoGallery;
+        public ProductService(IProductRepository repoProduct, ISubCategoryRepository repoSubCategory, IStockRepository repoStock, IGalleryRepository repoGallery)
         {
-            _context = context;
+            _repoProduct = repoProduct;
+            _repoSubCategory = repoSubCategory;
+            _repoStock = repoStock;
+            _repoGallery = repoGallery;
         }
 
-        public async Task<Product> AddProductAsync(CreateProductDto createProductDto)
+        public async Task<Product> HandleAddProductAsync(CreateProductDto createProductDto)
         {
-            var subIdExist = await _context.SubCategories.AnyAsync(s => s.Id == createProductDto.SubCategoryId);
+            var subIdExist = await _repoSubCategory.IsSubCategoryIdExist(createProductDto.SubCategoryId);
             if (!subIdExist)
             {
-                throw new InvalidOperationException("SubCategoryId not exist!");
+                throw new BadRequestException("SubCategoryId not exist!");
             }
 
-            var codeExist = await _context.Products.AnyAsync(p => p.Code == createProductDto.Code);
+            var codeExist = await _repoProduct.IsCodeExistAsync(createProductDto.Code);
             if (codeExist)
             {
-                throw new InvalidOperationException("Code is exist!");
+                throw new BadRequestException("Code is exist!");
             }
-
             var product = createProductDto.ToProductEntity();
-            await _context.AddAsync(product);
-            await _context.SaveChangesAsync();
+            await _repoProduct.AddProductAsync(product);
 
             var stock = new Stock
             {
                 ProductId = product.Id,
-                Quantity = createProductDto.Quantity
+                Quantity = createProductDto.Quantity,
+                Sold = 0,
             };
 
-            await _context.Stocks.AddAsync(stock);
+            await _repoStock.CreateStockAsync(stock);
 
             var gallery = createProductDto.Galleries.ToGalleryEntities(product.Id);
-            await _context.Galleries.AddRangeAsync(gallery);
-            await _context.SaveChangesAsync();
-            var result = await _context.Products
-                .Include(p => p.Stock)
-                .Include(p => p.SubCategory)
-                .Include(p => p.Galleries)
-                .FirstAsync(p => p.Id == product.Id);
+            await _repoGallery.CreateGalleryAsync(gallery);
 
-            return result;
+            return product;
         }
     }
 }
