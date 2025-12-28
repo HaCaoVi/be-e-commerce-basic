@@ -20,7 +20,6 @@ namespace e_commerce_basic.Repositories
         public async Task<List<Gallery>> CreateGalleryAsync(List<Gallery> listGallery)
         {
             await _context.Galleries.AddRangeAsync(listGallery);
-            await _context.SaveChangesAsync();
             return listGallery;
         }
     }

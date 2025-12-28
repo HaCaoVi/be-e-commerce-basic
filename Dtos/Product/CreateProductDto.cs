@@ -21,12 +21,14 @@ namespace e_commerce_basic.Dtos.Product
         [Required]
         public decimal Price { get; set; }
         [Required]
+        [Range(0, int.MaxValue)]
         public decimal Discount { get; set; }
         public EDiscount TypeDiscount { get; set; }
         public bool IsActivated { get; set; } = true;
         [Required]
         public int SubCategoryId { get; set; }
         [Required]
+        [Range(0, int.MaxValue)]
         public int Quantity { get; set; }
         [Required]
         [MinLength(1, ErrorMessage = "At least one gallery image is required")]

@@ -1,7 +1,5 @@
 using e_commerce_basic.Database;
-using e_commerce_basic.Dtos.Product;
 using e_commerce_basic.Interfaces;
-using e_commerce_basic.Mappings;
 using e_commerce_basic.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +16,6 @@ namespace e_commerce_basic.Repositories
         public async Task<Product> AddProductAsync(Product product)
         {
             await _context.AddAsync(product);
-            await _context.SaveChangesAsync();
             return product;
         }
 

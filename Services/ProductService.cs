@@ -9,47 +9,71 @@ namespace e_commerce_basic.Services
 {
     public class ProductService : IProductService
     {
+        private readonly ApplicationDBContext _dbContext;
         private readonly IProductRepository _repoProduct;
         private readonly ISubCategoryRepository _repoSubCategory;
         private readonly IStockRepository _repoStock;
         private readonly IGalleryRepository _repoGallery;
-        public ProductService(IProductRepository repoProduct, ISubCategoryRepository repoSubCategory, IStockRepository repoStock, IGalleryRepository repoGallery)
+        public ProductService(ApplicationDBContext dbContext, IProductRepository repoProduct, ISubCategoryRepository repoSubCategory, IStockRepository repoStock, IGalleryRepository repoGallery)
         {
+            _dbContext = dbContext;
             _repoProduct = repoProduct;
             _repoSubCategory = repoSubCategory;
             _repoStock = repoStock;
             _repoGallery = repoGallery;
         }
 
-        public async Task<Product> HandleAddProductAsync(CreateProductDto createProductDto)
+        public async Task<Product> HandleAddProductAsync(CreateProductDto createProductDto, CancellationToken cancellationToken)
         {
-            var subIdExist = await _repoSubCategory.IsSubCategoryIdExist(createProductDto.SubCategoryId);
-            if (!subIdExist)
+            using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+            try
             {
-                throw new BadRequestException("SubCategoryId not exist!");
+                var subIdExist = await _repoSubCategory.IsSubCategoryIdExist(createProductDto.SubCategoryId);
+                if (!subIdExist)
+                {
+                    throw new BadRequestException("SubCategoryId not exist!");
+                }
+
+                var codeExist = await _repoProduct.IsCodeExistAsync(createProductDto.Code);
+                if (codeExist)
+                {
+                    throw new BadRequestException("Code is exist!");
+                }
+
+                if (createProductDto.TypeDiscount == Types.EDiscount.Percent && createProductDto.Discount > 100)
+                {
+                    throw new BadRequestException("Discount percent must be between 0 and 100");
+                }
+
+                if (createProductDto.Price < createProductDto.Discount)
+                {
+                    throw new BadRequestException("Price must be greater than discount");
+                }
+
+                var product = createProductDto.ToProductEntity();
+                await _repoProduct.AddProductAsync(product);
+
+                var stock = new Stock
+                {
+                    ProductId = product.Id,
+                    Quantity = createProductDto.Quantity,
+                    Sold = 0,
+                };
+
+                await _repoStock.CreateStockAsync(stock);
+
+                var gallery = createProductDto.Galleries.ToGalleryEntities(product.Id);
+                await _repoGallery.CreateGalleryAsync(gallery);
+
+                await _dbContext.SaveChangesAsync(cancellationToken);
+                await transaction.CommitAsync(cancellationToken);
+                return product;
             }
-
-            var codeExist = await _repoProduct.IsCodeExistAsync(createProductDto.Code);
-            if (codeExist)
+            catch
             {
-                throw new BadRequestException("Code is exist!");
+                await transaction.RollbackAsync(cancellationToken);
+                throw;
             }
-            var product = createProductDto.ToProductEntity();
-            await _repoProduct.AddProductAsync(product);
-
-            var stock = new Stock
-            {
-                ProductId = product.Id,
-                Quantity = createProductDto.Quantity,
-                Sold = 0,
-            };
-
-            await _repoStock.CreateStockAsync(stock);
-
-            var gallery = createProductDto.Galleries.ToGalleryEntities(product.Id);
-            await _repoGallery.CreateGalleryAsync(gallery);
-
-            return product;
         }
     }
 }

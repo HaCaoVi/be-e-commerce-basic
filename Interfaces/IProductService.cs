@@ -5,6 +5,6 @@ namespace e_commerce_basic.Interfaces
 {
     public interface IProductService
     {
-        Task<Product> HandleAddProductAsync(CreateProductDto createProductDto);
+        Task<Product> HandleAddProductAsync(CreateProductDto createProductDto, CancellationToken cancellationToken);
     }
 }

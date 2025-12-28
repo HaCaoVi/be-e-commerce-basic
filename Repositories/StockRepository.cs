@@ -19,7 +19,6 @@ namespace e_commerce_basic.Repositories
         public async Task<Stock> CreateStockAsync(Stock stock)
         {
             await _context.Stocks.AddAsync(stock);
-            await _context.SaveChangesAsync();
             return stock;
         }
     }
