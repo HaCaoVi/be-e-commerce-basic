@@ -21,7 +21,6 @@ namespace e_commerce_basic.Models
         public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
         [Required]
         public int ProductId { get; set; }
-        public required Product Product { get; set; }
-
+        public Product? Product { get; set; }
     }
 }

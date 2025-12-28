@@ -50,11 +50,10 @@ namespace e_commerce_basic.Controllers
             return NoContent();
         }
 
-        [HttpGet()]
+        [HttpGet]
         public async Task<IActionResult> GetAccount()
         {
             var user = HttpContext.User;
-            var email = user.FindFirst(ClaimTypes.Email)?.Value;
             var username = user.FindFirst(ClaimTypes.GivenName)?.Value;
             var role = user.FindFirst(ClaimTypes.Role)?.Value;
             var Id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;

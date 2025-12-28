@@ -11,9 +11,9 @@ namespace e_commerce_basic.Models
         [Required]
         public int Quantity { get; set; }
         [Required]
-        public int Sold { get; set; }
+        public int Sold { get; set; } = 0;
         [Required]
         public int ProductId { get; set; }
-        public required Product Product { get; set; }
+        public Product? Product { get; set; }
     }
 }
