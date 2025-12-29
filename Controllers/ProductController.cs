@@ -1,7 +1,10 @@
+using e_commerce_basic.Helpers;
 using e_commerce_basic.Dtos.Product;
 using e_commerce_basic.Interfaces;
 using e_commerce_basic.Mappings;
 using Microsoft.AspNetCore.Mvc;
+using e_commerce_basic.Common;
+using Microsoft.AspNetCore.Authorization;
 
 namespace e_commerce_basic.Controllers
 {
@@ -16,10 +19,18 @@ namespace e_commerce_basic.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProduct([FromBody] CreateProductDto createProductDto, CancellationToken cancellationToken)
+        public async Task<ActionResult<ProductDto>> CreateProduct([FromBody] CreateProductDto createProductDto, CancellationToken cancellationToken)
         {
             var product = await _productService.HandleAddProductAsync(createProductDto, cancellationToken);
-            return Ok(product.ToProductDto());
+            return Ok(ApiResponse<ProductDto>.Ok(product));
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<PagedResult<ProductDto>>> GetList([FromQuery] QueryObject query, CancellationToken cancellationToken)
+        {
+            var products = await _productService.HandleGetListProduct(query, cancellationToken);
+            return Ok(ApiResponse<PagedResult<ProductDto>>.Ok(products));
         }
     }
 }

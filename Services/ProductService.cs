@@ -1,3 +1,4 @@
+using e_commerce_basic.Helpers;
 using e_commerce_basic.Common;
 using e_commerce_basic.Database;
 using e_commerce_basic.Dtos.Product;
@@ -23,7 +24,7 @@ namespace e_commerce_basic.Services
             _repoGallery = repoGallery;
         }
 
-        public async Task<Product> HandleAddProductAsync(CreateProductDto createProductDto, CancellationToken cancellationToken)
+        public async Task<ProductDto> HandleAddProductAsync(CreateProductDto createProductDto, CancellationToken cancellationToken)
         {
             using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
             try
@@ -67,13 +68,24 @@ namespace e_commerce_basic.Services
 
                 await _dbContext.SaveChangesAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
-                return product;
+                return product.ToProductDto();
             }
             catch
             {
                 await transaction.RollbackAsync(cancellationToken);
                 throw;
             }
+        }
+
+        public async Task<PagedResult<ProductDto>> HandleGetListProduct(QueryObject query, CancellationToken cancellationToken)
+        {
+            var pagedProducts = await _repoProduct.GetPagedProductsAsync(query, cancellationToken);
+            var dtoPaged = new PagedResult<ProductDto>
+            {
+                Meta = pagedProducts.Meta,
+                Result = pagedProducts.Result.ConvertAll(p => p.ToProductDto())
+            };
+            return dtoPaged;
         }
     }
 }
