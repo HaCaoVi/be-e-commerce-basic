@@ -52,7 +52,7 @@ namespace e_commerce_basic.Services
                 }
 
                 var product = createProductDto.ToProductEntity();
-                await _repoProduct.AddProductAsync(product);
+                await _repoProduct.AddAsync(product);
 
                 var stock = new Stock
                 {
@@ -77,9 +77,15 @@ namespace e_commerce_basic.Services
             }
         }
 
-        public async Task<PagedResult<ProductDto>> HandleGetListProduct(QueryObject query, CancellationToken cancellationToken)
+        public async Task<ProductDto> HandleGetByIdProductAsync(int id)
         {
-            var pagedProducts = await _repoProduct.GetPagedProductsAsync(query, cancellationToken);
+            var product = await _repoProduct.GetByIdAsync(id) ?? throw new KeyNotFoundException("Product not found");
+            return product.ToProductDto();
+        }
+
+        public async Task<PagedResult<ProductDto>> HandleGetListProductAsync(QueryObject query, CancellationToken cancellationToken)
+        {
+            var pagedProducts = await _repoProduct.GetAllAsync(query, cancellationToken);
             var dtoPaged = new PagedResult<ProductDto>
             {
                 Meta = pagedProducts.Meta,
@@ -87,5 +93,6 @@ namespace e_commerce_basic.Services
             };
             return dtoPaged;
         }
+
     }
 }

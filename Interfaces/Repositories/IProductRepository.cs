@@ -5,8 +5,9 @@ namespace e_commerce_basic.Interfaces
 {
     public interface IProductRepository
     {
-        Task<Product> AddProductAsync(Product product);
+        Task<Product> AddAsync(Product product);
         Task<bool> IsCodeExistAsync(string code);
-        Task<PagedResult<Product>> GetPagedProductsAsync(QueryObject query, CancellationToken cancellationToken);
+        Task<PagedResult<Product>> GetAllAsync(QueryObject query, CancellationToken cancellationToken);
+        Task<Product?> GetByIdAsync(int id);
     }
 }

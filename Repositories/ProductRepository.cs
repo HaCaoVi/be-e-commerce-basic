@@ -14,13 +14,13 @@ namespace e_commerce_basic.Repositories
             _context = context;
         }
 
-        public async Task<Product> AddProductAsync(Product product)
+        public async Task<Product> AddAsync(Product product)
         {
             await _context.AddAsync(product);
             return product;
         }
 
-        public async Task<PagedResult<Product>> GetPagedProductsAsync(QueryObject query, CancellationToken cancellationToken)
+        public async Task<PagedResult<Product>> GetAllAsync(QueryObject query, CancellationToken cancellationToken)
         {
             var products = _context.Products.AsNoTracking()
                             .Where(p => !p.IsDeleted);
@@ -71,6 +71,15 @@ namespace e_commerce_basic.Repositories
                 },
                 Result = result
             };
+        }
+
+        public async Task<Product?> GetByIdAsync(int id)
+        {
+            return await _context.Products
+         .AsNoTracking()
+         .Include(p => p.Stock)
+         .Include(p => p.Galleries)
+         .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
         }
 
         public async Task<bool> IsCodeExistAsync(string code)
