@@ -5,6 +5,7 @@ using e_commerce_basic.Dtos.Product;
 using e_commerce_basic.Interfaces;
 using e_commerce_basic.Mappings;
 using e_commerce_basic.Models;
+using e_commerce_basic.Types;
 
 namespace e_commerce_basic.Services
 {
@@ -35,13 +36,19 @@ namespace e_commerce_basic.Services
                     throw new BadRequestException("SubCategoryId not exist!");
                 }
 
-                var codeExist = await _repoProduct.IsCodeExistAsync(createProductDto.Code);
+                if (!Enum.IsDefined(typeof(EDiscount), createProductDto.TypeDiscount))
+                {
+                    throw new BadRequestException("Type discount invalid. Must be 0 and 1 same % and VND!");
+                }
+
+
+                var codeExist = await _repoProduct.IsCodeExistAsync(createProductDto.Code, null);
                 if (codeExist)
                 {
                     throw new BadRequestException("Code is exist!");
                 }
 
-                if (createProductDto.TypeDiscount == Types.EDiscount.Percent && createProductDto.Discount > 100)
+                if (createProductDto.TypeDiscount == EDiscount.Percent && createProductDto.Discount > 100)
                 {
                     throw new BadRequestException("Discount percent must be between 0 and 100");
                 }
@@ -64,7 +71,7 @@ namespace e_commerce_basic.Services
                 await _repoStock.CreateStockAsync(stock);
 
                 var gallery = createProductDto.Galleries.ToGalleryEntities(product.Id);
-                await _repoGallery.CreateGalleryAsync(gallery);
+                await _repoGallery.CreateAsync(gallery);
 
                 await _dbContext.SaveChangesAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
@@ -94,5 +101,60 @@ namespace e_commerce_basic.Services
             return dtoPaged;
         }
 
+        public async Task<ProductDto> HandleUpdateProductAsync(int id, UpdateProductDto updateProductDto, CancellationToken cancellationToken)
+        {
+            using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+            try
+            {
+                var product = await _repoProduct.ProductById(id) ?? throw new KeyNotFoundException("Product not found");
+                var isCodeExist = await _repoProduct.IsCodeExistAsync(updateProductDto.Code, id);
+                if (isCodeExist)
+                {
+                    throw new BadRequestException("Code is exist");
+                }
+                var subIdExist = await _repoSubCategory.IsSubCategoryIdExist(updateProductDto.SubCategoryId);
+                if (!subIdExist)
+                {
+                    throw new BadRequestException("SubCategoryId not exist!");
+                }
+
+                if (!Enum.IsDefined(typeof(EDiscount), updateProductDto.TypeDiscount))
+                {
+                    throw new BadRequestException("Type discount invalid. Must be 0 and 1 same % and VND!");
+                }
+                if (updateProductDto.TypeDiscount == EDiscount.Percent && updateProductDto.Discount > 100)
+                {
+                    throw new BadRequestException("Discount percent must be between 0 and 100");
+                }
+
+                if (updateProductDto.Price < updateProductDto.Discount)
+                {
+                    throw new BadRequestException("Price must be greater than discount");
+                }
+
+                product.Code = updateProductDto.Code;
+                product.Name = updateProductDto.Name;
+                product.Description = updateProductDto.Description;
+                product.Price = updateProductDto.Price;
+                product.Discount = updateProductDto.Discount;
+                product.TypeDiscount = updateProductDto.TypeDiscount;
+                product.IsActivated = updateProductDto.IsActivated;
+                product.SubCategoryId = updateProductDto.SubCategoryId;
+                product.UpdatedAt = DateTime.UtcNow;
+
+                await _repoStock.UpdateAsync(product.Id, updateProductDto.Quantity);
+
+                await _repoGallery.UpdateAsync(product.Id, updateProductDto.Galleries.ToGalleryEntities(product.Id));
+
+                await _dbContext.SaveChangesAsync(cancellationToken);
+                await transaction.CommitAsync(cancellationToken);
+                return product.ToProductDto();
+            }
+            catch
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                throw;
+            }
+        }
     }
 }

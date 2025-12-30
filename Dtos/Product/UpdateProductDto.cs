@@ -1,11 +1,10 @@
-
 using System.ComponentModel.DataAnnotations;
 using e_commerce_basic.Dtos.Gallery;
 using e_commerce_basic.Types;
 
 namespace e_commerce_basic.Dtos.Product
 {
-    public class CreateProductDto
+    public class UpdateProductDto
     {
         [Required]
         [MinLength(3)]
@@ -23,6 +22,7 @@ namespace e_commerce_basic.Dtos.Product
         [Required]
         [Range(0, int.MaxValue)]
         public decimal Discount { get; set; }
+        [Required]
         public EDiscount TypeDiscount { get; set; }
         public bool IsActivated { get; set; } = true;
         [Required]

@@ -39,5 +39,12 @@ namespace e_commerce_basic.Controllers
             var product = await _productService.HandleGetByIdProductAsync(id);
             return Ok(ApiResponse<ProductDto>.Ok(product));
         }
+
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> UpdateProduct([FromRoute] int id, [FromBody] UpdateProductDto updateProductDto, CancellationToken cancellationToken)
+        {
+            var product = await _productService.HandleUpdateProductAsync(id, updateProductDto, cancellationToken);
+            return Ok(ApiResponse<ProductDto>.Ok(product));
+        }
     }
 }

@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using e_commerce_basic.Database;
 using e_commerce_basic.Interfaces;
 using e_commerce_basic.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace e_commerce_basic.Repositories
 {
@@ -20,6 +17,14 @@ namespace e_commerce_basic.Repositories
         {
             await _context.Stocks.AddAsync(stock);
             return stock;
+        }
+
+        public async Task<bool> UpdateAsync(int productId, int quantity)
+        {
+            await _context.Stocks.Where(s => s.ProductId == productId).ExecuteUpdateAsync(s =>
+            s.SetProperty(x => x.Quantity, quantity)
+            );
+            return true;
         }
     }
 }

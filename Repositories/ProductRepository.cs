@@ -1,4 +1,5 @@
 using e_commerce_basic.Database;
+using e_commerce_basic.Dtos.Product;
 using e_commerce_basic.Helpers;
 using e_commerce_basic.Interfaces;
 using e_commerce_basic.Models;
@@ -82,10 +83,28 @@ namespace e_commerce_basic.Repositories
          .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
         }
 
-        public async Task<bool> IsCodeExistAsync(string code)
+        public async Task<bool> IsCodeExistAsync(string code, int? excludeProductId = null)
         {
-            var codeExist = await _context.Products.AnyAsync(p => p.Code == code);
-            return codeExist;
+            return await _context.Products.AnyAsync(p =>
+                p.Code == code &&
+                (!excludeProductId.HasValue || p.Id != excludeProductId.Value)
+            );
+        }
+
+        public async Task<Product?> ProductById(int id)
+        {
+            return await _context.Products.FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
+        }
+
+        public async Task<bool> UpdateAsync(Product product, UpdateProductDto updateProductDto)
+        {
+
+            return true;
+        }
+
+        public Task<bool> UpdateAsync(int id, Product product, UpdateProductDto updateProductDto)
+        {
+            throw new NotImplementedException();
         }
     }
 }
