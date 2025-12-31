@@ -30,31 +30,21 @@ namespace e_commerce_basic.Services
             using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
             try
             {
+                if (createProductDto.Price < createProductDto.Discount)
+                {
+                    throw new BadRequestException("Price must be greater than discount");
+                }
+
                 var subIdExist = await _repoSubCategory.IsSubCategoryIdExist(createProductDto.SubCategoryId);
                 if (!subIdExist)
                 {
                     throw new BadRequestException("SubCategoryId not exist!");
                 }
 
-                if (!Enum.IsDefined(typeof(EDiscount), createProductDto.TypeDiscount))
-                {
-                    throw new BadRequestException("Type discount invalid. Must be 0 and 1 same % and VND!");
-                }
-
                 var codeExist = await _repoProduct.IsCodeExistAsync(createProductDto.Code, null);
                 if (codeExist)
                 {
                     throw new BadRequestException("Code is exist!");
-                }
-
-                if (createProductDto.TypeDiscount == EDiscount.Percent && createProductDto.Discount > 100)
-                {
-                    throw new BadRequestException("Discount percent must be between 0 and 100");
-                }
-
-                if (createProductDto.Price < createProductDto.Discount)
-                {
-                    throw new BadRequestException("Price must be greater than discount");
                 }
 
                 var product = createProductDto.ToProductEntity();
@@ -101,30 +91,21 @@ namespace e_commerce_basic.Services
             using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
             try
             {
-                var product = await _repoProduct.ProductById(id) ?? throw new KeyNotFoundException("Product not found");
-                var isCodeExist = await _repoProduct.IsCodeExistAsync(updateProductDto.Code, id);
-                if (isCodeExist)
+                if (updateProductDto.Price < updateProductDto.Discount)
                 {
-                    throw new BadRequestException("Code is exist");
+                    throw new BadRequestException("Price must be greater than discount");
                 }
+
+                var product = await _repoProduct.ProductById(id) ?? throw new KeyNotFoundException("Product not found");
                 var subIdExist = await _repoSubCategory.IsSubCategoryIdExist(updateProductDto.SubCategoryId);
                 if (!subIdExist)
                 {
                     throw new BadRequestException("SubCategoryId not exist!");
                 }
-
-                if (!Enum.IsDefined(typeof(EDiscount), updateProductDto.TypeDiscount))
+                var isCodeExist = await _repoProduct.IsCodeExistAsync(updateProductDto.Code, id);
+                if (isCodeExist)
                 {
-                    throw new BadRequestException("Type discount invalid. Must be 0 and 1 same % and VND!");
-                }
-                if (updateProductDto.TypeDiscount == EDiscount.Percent && updateProductDto.Discount > 100)
-                {
-                    throw new BadRequestException("Discount percent must be between 0 and 100");
-                }
-
-                if (updateProductDto.Price < updateProductDto.Discount)
-                {
-                    throw new BadRequestException("Price must be greater than discount");
+                    throw new BadRequestException("Code is exist");
                 }
 
                 product.Code = updateProductDto.Code;
