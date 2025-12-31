@@ -69,6 +69,16 @@ namespace e_commerce_basic.Services
             }
         }
 
+        public async Task<bool> HandleDeleteAsync(int id, CancellationToken cancellationToken)
+        {
+            var deleted = await _repoProduct.DeleteAsync(id, cancellationToken);
+            if (!deleted)
+            {
+                throw new KeyNotFoundException("Product not found!");
+            }
+            return deleted;
+        }
+
         public async Task<ProductDto> HandleGetByIdProductAsync(int id)
         {
             var product = await _repoProduct.GetByIdAsync(id) ?? throw new KeyNotFoundException("Product not found");

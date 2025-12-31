@@ -46,5 +46,12 @@ namespace e_commerce_basic.Controllers
             var product = await _productService.HandleUpdateProductAsync(id, updateProductDto, cancellationToken);
             return Ok(ApiResponse<ProductDto>.Ok(product));
         }
+
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> DeleteProduct([FromRoute] int id, CancellationToken cancellationToken)
+        {
+            await _productService.HandleDeleteAsync(id, cancellationToken);
+            return NoContent();
+        }
     }
 }

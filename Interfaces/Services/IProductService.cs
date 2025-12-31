@@ -9,5 +9,6 @@ namespace e_commerce_basic.Interfaces
         Task<PagedResult<ProductDto>> HandleGetListProductAsync(QueryObject query, CancellationToken cancellationToken);
         Task<ProductDto> HandleGetByIdProductAsync(int id);
         Task<ProductDto> HandleUpdateProductAsync(int id, UpdateProductDto updateProductDto, CancellationToken cancellationToken);
+        Task<bool> HandleDeleteAsync(int id, CancellationToken cancellationToken);
     }
 }

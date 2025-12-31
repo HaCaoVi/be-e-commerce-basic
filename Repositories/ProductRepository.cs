@@ -21,6 +21,12 @@ namespace e_commerce_basic.Repositories
             return product;
         }
 
+        public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken)
+        {
+            var affected = await _context.Products.Where(p => p.Id == id && !p.IsDeleted).ExecuteUpdateAsync(p => p.SetProperty(x => x.IsDeleted, true), cancellationToken);
+            return affected > 0;
+        }
+
         public async Task<PagedResult<Product>> GetAllAsync(QueryObject query, CancellationToken cancellationToken)
         {
             var products = _context.Products.AsNoTracking()

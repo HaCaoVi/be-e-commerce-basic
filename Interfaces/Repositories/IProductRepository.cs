@@ -11,5 +11,7 @@ namespace e_commerce_basic.Interfaces
         Task<PagedResult<Product>> GetAllAsync(QueryObject query, CancellationToken cancellationToken);
         Task<Product?> GetByIdAsync(int id);
         Task<Product?> ProductById(int id);
+        Task<bool> DeleteAsync(int id, CancellationToken cancellationToken);
+
     }
 }
