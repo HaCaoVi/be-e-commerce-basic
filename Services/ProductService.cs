@@ -41,7 +41,6 @@ namespace e_commerce_basic.Services
                     throw new BadRequestException("Type discount invalid. Must be 0 and 1 same % and VND!");
                 }
 
-
                 var codeExist = await _repoProduct.IsCodeExistAsync(createProductDto.Code, null);
                 if (codeExist)
                 {
@@ -59,19 +58,15 @@ namespace e_commerce_basic.Services
                 }
 
                 var product = createProductDto.ToProductEntity();
-                await _repoProduct.AddAsync(product);
-
-                var stock = new Stock
+                product.Stock = new Stock
                 {
-                    ProductId = product.Id,
                     Quantity = createProductDto.Quantity,
                     Sold = 0,
                 };
 
-                await _repoStock.CreateStockAsync(stock);
+                product.Galleries = createProductDto.Galleries.ToGalleryEntities();
 
-                var gallery = createProductDto.Galleries.ToGalleryEntities(product.Id);
-                await _repoGallery.CreateAsync(gallery);
+                await _repoProduct.AddAsync(product);
 
                 await _dbContext.SaveChangesAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
@@ -144,7 +139,7 @@ namespace e_commerce_basic.Services
 
                 await _repoStock.UpdateAsync(product.Id, updateProductDto.Quantity);
 
-                await _repoGallery.UpdateAsync(product.Id, updateProductDto.Galleries.ToGalleryEntities(product.Id));
+                await _repoGallery.UpdateAsync(product.Id, updateProductDto.Galleries.ToGalleryEntities());
 
                 await _dbContext.SaveChangesAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);

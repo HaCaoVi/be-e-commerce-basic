@@ -5,7 +5,7 @@ namespace e_commerce_basic.Mappings
 {
     public static class GalleryMapping
     {
-        public static Gallery ToGalleryEntity(this CreateGalleryDto createGalleryDto, int productId)
+        public static Gallery ToGalleryEntity(this CreateGalleryDto createGalleryDto)
         {
             return new Gallery
             {
@@ -13,13 +13,12 @@ namespace e_commerce_basic.Mappings
                 Url = createGalleryDto.Url,
                 ContentType = createGalleryDto.ContentType,
                 FileName = createGalleryDto.FileName,
-                ProductId = productId
             };
         }
 
-        public static List<Gallery> ToGalleryEntities(this List<CreateGalleryDto> dtos, int productId)
+        public static List<Gallery> ToGalleryEntities(this List<CreateGalleryDto> dtos)
         {
-            return dtos.Select(x => x.ToGalleryEntity(productId)).ToList();
+            return dtos.Select(x => x.ToGalleryEntity()).ToList();
         }
     }
 }

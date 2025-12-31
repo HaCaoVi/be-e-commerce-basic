@@ -32,6 +32,6 @@ namespace e_commerce_basic.Dtos.Product
         public int Quantity { get; set; }
         [Required]
         [MinLength(1, ErrorMessage = "At least one gallery image is required")]
-        public List<CreateGalleryDto> Galleries { get; set; } = [];
+        public required List<CreateGalleryDto> Galleries { get; set; }
     }
 }

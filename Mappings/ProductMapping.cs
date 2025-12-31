@@ -25,15 +25,8 @@ namespace e_commerce_basic.Mappings
                 UpdatedAt = product.UpdatedAt,
                 Stock = product.Stock == null ? null : new StockDto
                 {
-                    Id = product.Stock.Id,
                     Quantity = product.Stock.Quantity,
                     Sold = product.Stock.Sold,
-                },
-                SubCategory = product.SubCategory == null ? null : new SubCategoryDto
-                {
-                    Id = product.SubCategory.Id,
-                    Name = product.SubCategory.Name,
-                    CategoryId = product.SubCategory.CategoryId,
                 },
                 Galleries = product.Galleries?.Select(g => new GalleryDto
                 {

@@ -21,7 +21,6 @@ namespace e_commerce_basic.Dtos.Product
         public DateTime? UpdatedAt { get; set; }
         public StockDto? Stock { get; set; }
         public int SubCategoryId { get; set; }
-        public SubCategoryDto? SubCategory { get; set; }
         public List<GalleryDto> Galleries { get; set; } = [];
     }
 }

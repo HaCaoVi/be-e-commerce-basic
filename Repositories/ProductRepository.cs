@@ -93,7 +93,7 @@ namespace e_commerce_basic.Repositories
 
         public async Task<Product?> ProductById(int id)
         {
-            return await _context.Products.FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
+            return await _context.Products.Include(p => p.Stock).FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
         }
     }
 }
